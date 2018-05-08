@@ -2,7 +2,7 @@ const next = require('next');
 const { microGraphiql, microGraphql } = require('apollo-server-micro');
 const micro = require('micro');
 const { get, post, router } = require('microrouter');
-const schema = require('./schema');
+const schema = require('./schema/index');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
