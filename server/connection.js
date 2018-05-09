@@ -16,10 +16,10 @@ module.exports = memoize(() => {
     username: configLoader.loadConfig(ConfigKeys.DB_USERNAME, 'postgres'),
     password: configLoader.loadConfig(ConfigKeys.DB_PASSWORD, 'postgres'),
     database: configLoader.loadConfig(ConfigKeys.DB_DATABASE, 'postgres'),
-    entities: [__dirname + '/entities/*.ts'],
+    entities: [__dirname + '/entities/*.js'],
     autoSchemaSync: true,
     synchronize: true,
-    logging: configLoader.loadConfig(ConfigKeys.DB_LOGGING, true),
+    logging: configLoader.loadConfig(ConfigKeys.DB_LOGGING, 'all'),
     logger: 'advanced-console',
   });
 });

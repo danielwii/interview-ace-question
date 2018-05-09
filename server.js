@@ -2,7 +2,7 @@ const next = require('next');
 const { microGraphiql, microGraphql } = require('apollo-server-micro');
 const micro = require('micro');
 const { get, post, router } = require('microrouter');
-const schema = require('./server/schema');
+const schema = require('./server/schemas');
 const logger = require('consola').withScope('server');
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -34,6 +34,3 @@ const init = require('./server/connection');
     });
   });
 })();
-
-// https://stackoverflow.com/questions/40900791/cannot-redeclare-block-scoped-variable-in-unrelated-files
-// export {};
