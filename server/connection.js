@@ -1,9 +1,11 @@
-const { createConnection } = require('typeorm');
-const { memoize } = require('lodash');
-const { configLoader, ConfigKeys } = require('./helpers/config');
+import { createConnection } from 'typeorm';
+import { memoize } from 'lodash';
+
+import { ConfigKeys, configLoader } from './helpers/config';
+
 const logger = require('consola').withScope('connection');
 
-module.exports = memoize(() => {
+export default memoize(() => {
   const type = configLoader.loadConfig(ConfigKeys.DB_ENGINE, 'postgres');
   const host = configLoader.loadConfig(ConfigKeys.DB_HOST, 'localhost');
   const port = configLoader.loadConfig(ConfigKeys.DB_PORT, 5432);

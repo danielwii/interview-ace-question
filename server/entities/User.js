@@ -5,8 +5,10 @@ import { Answer } from './Answer';
 
 @Entity()
 export class User extends AbstractBaseEntity {
-  @Column('varchar') username;
+  @Column('varchar') username = undefined;
 
-  @OneToMany(type => Answer, answer => answer.user)
-  answers;
+  @OneToMany(type => Answer, answer => answer.user, {
+    onDelete: 'CASCADE',
+  })
+  answers = undefined;
 }

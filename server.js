@@ -1,20 +1,26 @@
-const next = require('next');
-const { microGraphiql, microGraphql } = require('apollo-server-micro');
-const micro = require('micro');
-const { get, post, router } = require('microrouter');
-const schema = require('./server/schemas');
+import next from 'next';
+import micro from 'micro';
+import { microGraphiql, microGraphql } from 'apollo-server-micro';
+import { get, post, router } from 'microrouter';
+
+import createConnection from './server/connection';
+import schema from './server/schema';
+import { loadSeeds } from './server/seeds';
+
 const logger = require('consola').withScope('server');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
-
-// connecting to db
-const init = require('./server/connection');
-
 (async () => {
   logger.info('connecting to db...');
-  await init();
+  try {
+    await createConnection();
+    await loadSeeds();
+  } catch (e) {
+    logger.error(e);
+    process.exit(1);
+  }
 
   logger.info('create server...');
   const graphqlHandler = microGraphql({ schema });

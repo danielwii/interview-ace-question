@@ -1,11 +1,11 @@
-import { CreateDateColumn, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export class AbstractBaseEntity {
-  @PrimaryColumn('uuid') id;
+  @PrimaryGeneratedColumn() id = undefined;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt;
+  createdAt = undefined;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt;
+  updatedAt = undefined;
 }

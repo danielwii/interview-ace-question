@@ -1,4 +1,4 @@
-const { createConfigLoader } = require('node-buffs');
+import { createConfigLoader } from 'node-buffs';
 
 const ConfigKeys = {
   DB_ENGINE: 'DB_ENGINE',
