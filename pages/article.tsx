@@ -1,10 +1,10 @@
 import React from 'react';
 
 import Layout from '../components/Layout';
-import Signup from '../containers/Article';
+import Article from '../containers/Article';
 
 export default () => (
   <Layout>
-    <Signup />
+    <Article />
   </Layout>
 );

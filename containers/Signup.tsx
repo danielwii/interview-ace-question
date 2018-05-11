@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { MutationResult } from 'react-apollo/Mutation';
 import Router from 'next/router';
 
-import Signup from '../components/Signup';
+import SignupComponent from '../components/Signup';
 
 const SIGNUP = gql`
   mutation signup($username: String!) {
@@ -19,7 +19,7 @@ interface IState {
   loading: boolean;
 }
 
-export default class extends React.Component<any, IState> {
+export default class Signup extends React.Component<any, IState> {
   input: HTMLInputElement;
   state: IState = {
     loading: false,
@@ -39,7 +39,7 @@ export default class extends React.Component<any, IState> {
         onError={() => this.setState({ loading: false })}
       >
         {(signup, result: MutationResult<any>) => (
-          <Signup loading={loading} signup={signup} result={result} />
+          <SignupComponent loading={loading} signup={signup} result={result} />
         )}
       </Mutation>
     );
