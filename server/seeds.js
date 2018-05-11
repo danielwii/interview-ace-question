@@ -52,6 +52,7 @@ export async function loadSeeds() {
     let choice1_c = new Choice();
     choice1_c.key = 'C';
     choice1_c.value = 'The Gates Foundation';
+    choice1_c.isCorrect = true;
     let choice1_d = new Choice();
     choice1_d.key = 'D';
     choice1_d.value = 'Templeton World Charity Foundation, Inc. (TWCF)';
@@ -73,6 +74,7 @@ export async function loadSeeds() {
     let choice2_a = new Choice();
     choice2_a.key = 'A';
     choice2_a.value = '😊';
+    choice2_a.isCorrect = true;
     let choice2_b = new Choice();
     choice2_b.key = 'B';
     choice2_b.value = '🐍';
@@ -109,6 +111,7 @@ export async function loadSeeds() {
     let choice3_d = new Choice();
     choice3_d.key = 'D';
     choice3_d.value = 'biggest';
+    choice3_d.isCorrect = true;
 
     await choiceRepo.save([choice3_a, choice3_b, choice3_c, choice3_d]);
 

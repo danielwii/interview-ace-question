@@ -26,7 +26,7 @@ export default class Signup extends React.Component<any, IState> {
   };
 
   toArticle = ({ signup }) => {
-    Router.push({ pathname: '/article', query: { name: signup.username } });
+    Router.push({ pathname: '/article', query: { uid: signup.id } });
   };
 
   render() {

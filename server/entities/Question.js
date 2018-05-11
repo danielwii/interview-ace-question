@@ -3,6 +3,7 @@ import { Column, Entity, ManyToOne, OneToMany, JoinColumn, OneToOne } from 'type
 import { AbstractBaseEntity } from './base';
 import { Article } from './Article';
 import { Choice } from './Choice';
+import { Answer } from './Answer';
 
 @Entity()
 export class Question extends AbstractBaseEntity {
@@ -16,6 +17,9 @@ export class Question extends AbstractBaseEntity {
 
   @OneToMany(type => Choice, choice => choice.question, { cascade: true, onDelete: 'CASCADE' })
   choices = undefined;
+
+  @OneToMany(type => Answer, answer => answer.question, { onDelete: 'CASCADE' })
+  answers = undefined;
 
   @ManyToOne(type => Article, article => article.quesions)
   @JoinColumn({ name: 'article_id' })

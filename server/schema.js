@@ -14,6 +14,7 @@ const typeDefs = `
     id: ID!
     content: String
     questions: [Question]
+    answers(userId: ID!): [Answer]
     createdAt: String
     updatedAt: String
   }
@@ -30,6 +31,7 @@ const typeDefs = `
   
   type Choice {
     id: ID!
+    isCorrect: Boolean
     key: String
     value: String
     question: Question
@@ -39,8 +41,9 @@ const typeDefs = `
   
   type Answer {
     id: ID!
+    isCorrect: Boolean
     choice: Choice
-    isRight: Boolean
+    question: Question
     createdAt: String
     updatedAt: String
   }
@@ -61,6 +64,7 @@ const typeDefs = `
   type Query {
     articles: [Article]
     questions: [Question]
+    question(id: ID!): Question
   }
 `;
 
@@ -69,9 +73,16 @@ const resolvers = {
   Query: {
     articles: () => getRepository(Article).find(),
     questions: () => getRepository(Question).find(),
+    question: (_, { id }) => getRepository(Question).findOneOrFail(id),
   },
 
   Mutation: {
+    /**
+     * 用户注册
+     * @param _
+     * @param username
+     * @returns {Promise<{username: *}>}
+     */
     async signup(_, { username }) {
       logger.info('signup', JSON.stringify({ username }, null, 2));
       const [, exists] = await getRepository(User).findAndCount({ username });
@@ -83,51 +94,84 @@ const resolvers = {
       }
       return getRepository(User).save({ username });
     },
+    /**
+     * 回答问题
+     * @param _
+     * @param userId
+     * @param questionId
+     * @param choiceId
+     * @returns {Promise<Answer>}
+     */
     async answer(_, { userId, questionId, choiceId }) {
       logger.info('answer question', JSON.stringify({ userId, questionId, choiceId }, null, 2));
       const user = await getRepository(User).findOneOrFail(userId);
       const question = await getRepository(Question).findOneOrFail(questionId, {
         loadRelationIds: true,
       });
+      logger.info(JSON.stringify({ user, question }));
       const choice = await getRepository(Choice).findOneOrFail(choiceId);
 
       if (!(choice.id in question.choices)) {
         throw new Error(`operation error! ${choice.id} not in ${question.choices()}`);
       }
-      const correct = await getRepository(Choice).findOneOrFail(question.correctChoice);
 
       const entity = new Answer();
       entity.article = { id: question.article };
-      entity.isRight = choiceId === question.correctChoice;
       entity.question = { id: questionId };
       entity.choice = choiceId;
+      entity.isCorrect = choice.isCorrect;
       entity.user = { id: userId };
+
+      const [, exists] = await getRepository(Answer).findAndCount({
+        article: { id: question.article },
+        question: { id: questionId },
+      });
+      if (exists) {
+        throw new Error(`question '${questionId}' already answered.`);
+      }
       const answer = await getRepository(Answer).save(entity);
-      return {
-        answer,
-        correct,
-      };
+      return getRepository(Answer).findOne(answer.id, {
+        relations: ['choice', 'question', 'question.correctChoice'],
+      });
     },
   },
 
   Article: {
-    questions(article) {
-      return getRepository(Question).find({
+    questions: article =>
+      getRepository(Question).find({
         article: { id: article.id },
         loadRelationIds: true,
-      });
+      }),
+    answers: (article, { userId }) =>
+      getRepository(Answer).find({
+        user: { id: userId },
+        article,
+        loadRelationIds: true,
+      }),
+  },
+
+  Answer: {
+    choice: answer => {
+      // logger.info(JSON.stringify(answer, null, 2));
+      return answer.choice && getRepository(Choice).findOneOrFail(answer.choice);
+    },
+    question: answer => {
+      // logger.info(JSON.stringify(answer, null, 2));
+      return answer.question && getRepository(Question).findOneOrFail(answer.question);
     },
   },
 
   Question: {
     article(question) {
-      return getRepository(Article).findOne(question.article);
+      return question.article && getRepository(Article).findOneOrFail(question.article);
     },
-    correctChoice(question) {
-      return getRepository(Choice).findOne(question.correctChoice);
+    async correctChoice(question) {
+      const reload = await getRepository(Question).findOne(question.id, { loadRelationIds: true });
+      // logger.info(JSON.stringify({ question, reload }, null, 2));
+      return reload.correctChoice && getRepository(Choice).findOneOrFail(reload.correctChoice);
     },
     choices(question) {
-      return getRepository(Choice).find({ question: { id: question.id } });
+      return question && getRepository(Choice).find({ question });
     },
   },
 };

@@ -9,22 +9,22 @@ import { Choice } from './Choice';
 
 @Entity()
 export class Answer extends AbstractBaseEntity {
-  @OneToOne(type => Choice)
+  @Column('boolean', { name: 'is_correct' })
+  isCorrect = undefined;
+
+  @OneToOne(type => Choice, choice => choice.answer, { primary: true })
   @JoinColumn({ name: 'choice_id' })
   choice = undefined;
 
-  @Column('boolean', { name: 'is_right' })
-  isRight = undefined;
-
-  @ManyToOne(type => Article, article => article.quesions)
+  @ManyToOne(type => Article, article => article.answers)
   @JoinColumn({ name: 'article_id' })
   article = undefined;
 
-  @ManyToOne(type => Question, question => question.choices)
+  @ManyToOne(type => Question, question => question.answers)
   @JoinColumn({ name: 'question_id' })
   question = undefined;
 
-  @ManyToOne(type => User, user => user.choices)
+  @ManyToOne(type => User, user => user.answers)
   @JoinColumn({ name: 'user_id' })
   user = undefined;
 }
