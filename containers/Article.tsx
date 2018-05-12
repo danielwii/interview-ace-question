@@ -56,9 +56,9 @@ export default class Article extends React.Component<IProp, IState> {
     const { userId } = this.props;
     return (
       <Query query={GET_ARTICLES} variables={{ userId }}>
-        {({ loading, error, data, refetch, networkStatus }) => {
+        {({ loading, error, data }) => {
           const { articles } = data;
-          console.log(data);
+          // console.log(data);
           return (
             <ArticleComponent
               articles={articles || []}

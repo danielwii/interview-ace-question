@@ -85,7 +85,7 @@ const resolvers = {
      * @returns {Promise<{username: *}>}
      */
     async signup(_, { username }) {
-      logger.info('signup', JSON.stringify({ username }, null, 2));
+      logger.debug('signup', JSON.stringify({ username }, null, 2));
       const [, exists] = await getRepository(User).findAndCount({ username });
       if (exists) {
         throw new Error(`user '${username}' already exists.`);
@@ -104,7 +104,7 @@ const resolvers = {
      * @returns {Promise<Answer>}
      */
     async answer(_, { userId, questionId, choiceId }) {
-      logger.info('answer question', JSON.stringify({ userId, questionId, choiceId }, null, 2));
+      logger.debug('answer question', JSON.stringify({ userId, questionId, choiceId }, null, 2));
       const user = await getRepository(User).findOneOrFail(userId);
       const question = await getRepository(Question).findOneOrFail(questionId, {
         loadRelationIds: true,
@@ -153,15 +153,15 @@ const resolvers = {
 
   Answer: {
     choice: answer => {
-      logger.info('Answer.choice', JSON.stringify(answer, null, 2));
+      logger.debug('Answer.choice', JSON.stringify(answer, null, 2));
       return answer.choice && getRepository(Choice).findOneOrFail(answer.choice);
     },
     question: answer => {
-      logger.info('Answer.question', JSON.stringify(answer, null, 2));
+      logger.debug('Answer.question', JSON.stringify(answer, null, 2));
       return answer.question && getRepository(Question).findOneOrFail(answer.question);
     },
     article: answer => {
-      logger.info('Answer.article', JSON.stringify(answer, null, 2));
+      logger.debug('Answer.article', JSON.stringify(answer, null, 2));
       return answer.article && getRepository(Article).findOneOrFail(answer.article);
     },
   },

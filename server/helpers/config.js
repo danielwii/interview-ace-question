@@ -1,6 +1,6 @@
 import { createConfigLoader } from 'node-buffs';
 
-const ConfigKeys = {
+export const ConfigKeys = {
   DB_ENGINE: 'DB_ENGINE',
   DB_HOST: 'DB_HOST',
   DB_PORT: 'DB_PORT',
@@ -10,9 +10,4 @@ const ConfigKeys = {
   DB_PASSWORD: 'DB_PASSWORD',
 };
 
-const configLoader = createConfigLoader();
-
-module.exports = {
-  ConfigKeys,
-  configLoader,
-};
+export const configLoader = createConfigLoader();
