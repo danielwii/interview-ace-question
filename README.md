@@ -1,12 +1,19 @@
 ## AceEducation Question
 
-Server: micro/graphql/typeorm
+Server: nextjs/micro/apollo-server/typeorm
+Client: nextjs/apollo-client/react/bulma
 
 ## Development
 
 ```bash
 # run test db
-$ docker run --name pg -e POSTGRES_PASSWORD=test-only -d postgres
+docker run --name pg -e POSTGRES_PASSWORD=test-only -d postgres
+```
+
+## Test
+
+```bash
+yarn test
 ```
 
 ## Run in docker
