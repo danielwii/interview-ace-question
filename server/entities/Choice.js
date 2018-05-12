@@ -16,7 +16,4 @@ export class Choice extends AbstractBaseEntity {
   @ManyToOne(type => Question, question => question.choices)
   @JoinColumn({ name: 'question_id' })
   question = undefined;
-
-  @OneToOne(type => Answer, answer => answer.choice)
-  answer = undefined;
 }

@@ -44,6 +44,7 @@ const typeDefs = `
     isCorrect: Boolean
     choice: Choice
     question: Question
+    article: Article
     createdAt: String
     updatedAt: String
   }
@@ -108,11 +109,11 @@ const resolvers = {
       const question = await getRepository(Question).findOneOrFail(questionId, {
         loadRelationIds: true,
       });
-      logger.info(JSON.stringify({ user, question }));
       const choice = await getRepository(Choice).findOneOrFail(choiceId);
+      // logger.info(JSON.stringify({ choice, user, question }, null, 2));
 
-      if (!(choice.id in question.choices)) {
-        throw new Error(`operation error! ${choice.id} not in ${question.choices()}`);
+      if (!question.choices.includes(choice.id)) {
+        throw new Error(`operation error! ${choice.id} not in ${question.choices}`);
       }
 
       const entity = new Answer();
@@ -122,17 +123,17 @@ const resolvers = {
       entity.isCorrect = choice.isCorrect;
       entity.user = { id: userId };
 
-      const [, exists] = await getRepository(Answer).findAndCount({
+      const [existsAnswers, exists] = await getRepository(Answer).findAndCount({
         article: { id: question.article },
         question: { id: questionId },
       });
       if (exists) {
+        // 目前限制了只能回答一次
+        // await getRepository(Answer).remove(existsAnswers);
         throw new Error(`question '${questionId}' already answered.`);
       }
       const answer = await getRepository(Answer).save(entity);
-      return getRepository(Answer).findOne(answer.id, {
-        relations: ['choice', 'question', 'question.correctChoice'],
-      });
+      return getRepository(Answer).findOneOrFail(answer.id, { loadRelationIds: true });
     },
   },
 
@@ -152,12 +153,16 @@ const resolvers = {
 
   Answer: {
     choice: answer => {
-      // logger.info(JSON.stringify(answer, null, 2));
+      logger.info('Answer.choice', JSON.stringify(answer, null, 2));
       return answer.choice && getRepository(Choice).findOneOrFail(answer.choice);
     },
     question: answer => {
-      // logger.info(JSON.stringify(answer, null, 2));
+      logger.info('Answer.question', JSON.stringify(answer, null, 2));
       return answer.question && getRepository(Question).findOneOrFail(answer.question);
+    },
+    article: answer => {
+      logger.info('Answer.article', JSON.stringify(answer, null, 2));
+      return answer.article && getRepository(Article).findOneOrFail(answer.article);
     },
   },
 

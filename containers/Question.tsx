@@ -10,6 +10,9 @@ const ANSWER_QUESTION = gql`
     answer(userId: $userId, questionId: $questionId, choiceId: $choiceId) {
       id
       isCorrect
+      choice {
+        id
+      }
       question {
         correctChoice {
           id
@@ -59,7 +62,7 @@ export default class Question extends React.Component<IProp, IState> {
               <article className="message is-success">
                 <div className="message-body">
                   <strong>RIGHT</strong>
-                  <pre>{JSON.stringify(answer, null, 2)}</pre>
+                  {/*<pre>{JSON.stringify(answer, null, 2)}</pre>*/}
                 </div>
               </article>
             </div>
@@ -84,7 +87,7 @@ export default class Question extends React.Component<IProp, IState> {
     const { question, answer, userId } = this.props;
     return (
       <Mutation mutation={ANSWER_QUESTION}>
-        {(answerQuestion, { called, loading, error, data }) => {
+        {(answerQuestion, { called, loading, error, data = {} }) => {
           if (called && error) {
             alert(error.message);
           }
@@ -92,7 +95,7 @@ export default class Question extends React.Component<IProp, IState> {
             <div>
               <p>Question {question.id}:</p>
               <p>{question.title}</p>
-              {this._renderChoices(question.choices, answer, choice => {
+              {this._renderChoices(question.choices, (data && data.answer) || answer, choice => {
                 answerQuestion({
                   variables: { userId, questionId: question.id, choiceId: choice.id },
                 });
