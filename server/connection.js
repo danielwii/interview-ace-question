@@ -9,7 +9,7 @@ export default memoize(() => {
   const type = configLoader.loadConfig(ConfigKeys.DB_ENGINE, 'postgres');
   const host = configLoader.loadConfig(ConfigKeys.DB_HOST, 'localhost');
   const port = configLoader.loadConfig(ConfigKeys.DB_PORT, 5432);
-  logger.info(`try to connect to ${type}@${host}:${port}`);
+  logger.info(`try to connect to ${type}://${host}:${port}`);
 
   return createConnection({
     type,
