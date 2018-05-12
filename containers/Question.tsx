@@ -91,14 +91,17 @@ export default class Question extends React.Component<IProp, IState> {
           if (called && error) {
             alert(error.message);
           }
+          const calledAnswer = (data && data.answer) || answer;
           return (
             <div>
               <p>Question {question.id}:</p>
               <p>{question.title}</p>
-              {this._renderChoices(question.choices, (data && data.answer) || answer, choice => {
-                answerQuestion({
-                  variables: { userId, questionId: question.id, choiceId: choice.id },
-                });
+              {this._renderChoices(question.choices, calledAnswer, choice => {
+                if (!calledAnswer) {
+                  answerQuestion({
+                    variables: { userId, questionId: question.id, choiceId: choice.id },
+                  });
+                }
               })}
               <br />
             </div>

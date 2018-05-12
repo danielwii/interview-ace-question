@@ -12,7 +12,7 @@ export class Answer extends AbstractBaseEntity {
   @Column('boolean', { name: 'is_correct' })
   isCorrect = undefined;
 
-  @OneToOne(type => Choice)
+  @ManyToOne(type => Choice, choice => choice.answers)
   @JoinColumn({ name: 'choice_id' })
   choice = undefined;
 

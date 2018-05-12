@@ -13,18 +13,83 @@ import { loadSeeds } from '../server/seeds';
 import createConnection from '../server/connection';
 import schema from '../server/schema';
 import { User } from '../server/entities/User';
+import { Article } from '../server/entities/Article';
 
 describe('graphql api', () => {
   let client;
+  const service = micro(microGraphql({ schema }));
+  const GET_ARTICLES = gql`
+    query articles($userId: ID!) {
+      articles {
+        id
+        content
+        answers(userId: $userId) {
+          id
+          isCorrect
+          question {
+            id
+            correctChoice {
+              id
+              key
+              value
+            }
+          }
+          choice {
+            id
+          }
+        }
+        questions {
+          id
+          title
+          choices {
+            id
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
+  const SIGNUP = gql`
+    mutation signup($username: String!) {
+      signup(username: $username) {
+        id
+        username
+      }
+    }
+  `;
 
+  const ANSWER_QUESTION = gql`
+    mutation answer($userId: ID!, $questionId: ID!, $choiceId: ID!) {
+      answer(userId: $userId, questionId: $questionId, choiceId: $choiceId) {
+        id
+        isCorrect
+        choice {
+          id
+        }
+        question {
+          id
+          correctChoice {
+            id
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
   beforeAll(async () => {
-    const url = await listen(micro(microGraphql({ schema })));
+    const url = await listen(service);
     const link = createHttpLink({ uri: url, fetch: fetch });
     client = new ApolloClient({
       link,
       cache: new InMemoryCache(),
     });
     return createConnection();
+  });
+
+  afterAll(() => {
+    service.close();
   });
 
   beforeEach(async () => {
@@ -35,39 +100,6 @@ describe('graphql api', () => {
   afterEach(async () => {});
 
   describe('query articles', () => {
-    const GET_ARTICLES = gql`
-      query articles($userId: ID!) {
-        articles {
-          id
-          content
-          answers(userId: $userId) {
-            id
-            isCorrect
-            question {
-              id
-              correctChoice {
-                id
-                key
-                value
-              }
-            }
-            choice {
-              id
-            }
-          }
-          questions {
-            id
-            title
-            choices {
-              id
-              key
-              value
-            }
-          }
-        }
-      }
-    `;
-
     it('should return correct articles by gql', async () => {
       const { data } = await client.query({
         query: GET_ARTICLES,
@@ -80,15 +112,6 @@ describe('graphql api', () => {
   });
 
   describe('signup', () => {
-    const SIGNUP = gql`
-      mutation signup($username: String!) {
-        signup(username: $username) {
-          id
-          username
-        }
-      }
-    `;
-
     it('should return username after signup', async () => {
       const { data } = await client.mutate({
         mutation: SIGNUP,
@@ -100,26 +123,6 @@ describe('graphql api', () => {
   });
 
   describe('answer', () => {
-    const ANSWER_QUESTION = gql`
-      mutation answer($userId: ID!, $questionId: ID!, $choiceId: ID!) {
-        answer(userId: $userId, questionId: $questionId, choiceId: $choiceId) {
-          id
-          isCorrect
-          choice {
-            id
-          }
-          question {
-            id
-            correctChoice {
-              id
-              key
-              value
-            }
-          }
-        }
-      }
-    `;
-
     beforeEach(async () => {
       getManager().save(User, { username: 'u1' });
     });

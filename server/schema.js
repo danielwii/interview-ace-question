@@ -124,8 +124,11 @@ const resolvers = {
       entity.user = { id: userId };
 
       const [existsAnswers, exists] = await getRepository(Answer).findAndCount({
-        article: { id: question.article },
-        question: { id: questionId },
+        where: {
+          user: { id: userId },
+          article: { id: question.article },
+          question: { id: questionId },
+        },
       });
       if (exists) {
         // 目前限制了只能回答一次
@@ -140,28 +143,32 @@ const resolvers = {
   Article: {
     questions: article =>
       getRepository(Question).find({
-        article: { id: article.id },
+        where: { article: { id: article.id } },
         loadRelationIds: true,
       }),
-    answers: (article, { userId }) =>
-      getRepository(Answer).find({
-        user: { id: userId },
-        article,
+    answers: (article, { userId }) => {
+      logger.debug('Article.answers', JSON.stringify({ article, userId }, null, 2));
+      return getRepository(Answer).find({
+        where: {
+          user: { id: userId },
+          article,
+        },
         loadRelationIds: true,
-      }),
+      });
+    },
   },
 
   Answer: {
     choice: answer => {
-      logger.debug('Answer.choice', JSON.stringify(answer, null, 2));
+      // logger.info('Answer.choice', JSON.stringify(answer, null, 2));
       return answer.choice && getRepository(Choice).findOneOrFail(answer.choice);
     },
     question: answer => {
-      logger.debug('Answer.question', JSON.stringify(answer, null, 2));
+      // logger.info('Answer.question', JSON.stringify(answer, null, 2));
       return answer.question && getRepository(Question).findOneOrFail(answer.question);
     },
     article: answer => {
-      logger.debug('Answer.article', JSON.stringify(answer, null, 2));
+      // logger.info('Answer.article', JSON.stringify(answer, null, 2));
       return answer.article && getRepository(Article).findOneOrFail(answer.article);
     },
   },
@@ -176,7 +183,7 @@ const resolvers = {
       return reload.correctChoice && getRepository(Choice).findOneOrFail(reload.correctChoice);
     },
     choices(question) {
-      return question && getRepository(Choice).find({ question });
+      return question && getRepository(Choice).find({ where: { question } });
     },
   },
 };

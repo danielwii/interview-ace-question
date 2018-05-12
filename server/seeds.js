@@ -121,6 +121,6 @@ export async function loadSeeds() {
 
     article.questions = [question1, question2, question3];
 
-    articleRepo.save(article);
+    await articleRepo.save(article);
   }
 }
